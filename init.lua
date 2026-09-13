@@ -1,4 +1,4 @@
---- === Cubby ===
+--- === Hopper ===
 ---
 --- Reach into a folder, grab whatever landed there most recently.
 ---
@@ -7,27 +7,27 @@
 --- no digging through Desktop clutter or a Downloads folder sorted by name.
 ---
 --- Usage:
----   hs.loadSpoon("Cubby")
----   spoon.Cubby:copy("screenshot")   -- clipboard, ready to paste into chat
----   spoon.Cubby:open("download")     -- opens with its default app
----   spoon.Cubby:reveal("screenshot") -- selected in Finder
+---   hs.loadSpoon("Hopper")
+---   spoon.Hopper:copy("screenshot")   -- clipboard, ready to paste into chat
+---   spoon.Hopper:open("download")     -- opens with its default app
+---   spoon.Hopper:reveal("screenshot") -- selected in Finder
 ---
 --- Add a spot of your own:
----   spoon.Cubby.spots.receipts = { dir = "/path/to/folder", extensions = {"pdf"} }
+---   spoon.Hopper.spots.receipts = { dir = "/path/to/folder", extensions = {"pdf"} }
 ---
---- Download: https://github.com/MadnessEngineering/Cubby.spoon
+--- Download: https://github.com/MadnessEngineering/Hopper.spoon
 
 local obj = {}
 obj.__index = obj
 
-obj.name = "Cubby"
+obj.name = "Hopper"
 obj.version = "1.0"
 obj.author = "Dan Edens"
-obj.homepage = "https://github.com/MadnessEngineering/Cubby.spoon"
+obj.homepage = "https://github.com/MadnessEngineering/Hopper.spoon"
 obj.license = "MIT - https://opensource.org/licenses/MIT"
 
 local function log()
-    return _G.AppLogger or hs.logger.new("Cubby")
+    return _G.AppLogger or hs.logger.new("Hopper")
 end
 
 -- Deciding "copy as a picture" vs "copy as a file" by extension, not by spot,
@@ -38,7 +38,7 @@ local IMAGE_EXTENSIONS = {
     bmp = true, tiff = true, heic = true, webp = true,
 }
 
---- Cubby.spots
+--- Hopper.spots
 --- Variable
 --- Named folders to reach into. Each entry: `dir` (a path, or a function
 --- returning one — `screenshot` resolves its real save location lazily, since
@@ -83,7 +83,7 @@ local function matchesExtension(filename, extensions)
     return false
 end
 
---- Cubby.newestIn(dir, extensions)
+--- Hopper.newestIn(dir, extensions)
 --- Function
 --- The newest file directly inside `dir` whose name matches `extensions` (a
 --- list of lowercase extensions, or nil for any file). Does not recurse.
@@ -110,21 +110,21 @@ function obj.newestIn(dir, extensions)
     return newestPath
 end
 
---- Cubby:find(spotName)
+--- Hopper:find(spotName)
 --- Method
 --- The newest file in a named spot, or nil (having alerted why) if there is
 --- no such spot or nothing in it yet.
 function obj:find(spotName)
     local spot = self.spots[spotName]
     if not spot then
-        hs.alert.show("Cubby: no spot named '" .. tostring(spotName) .. "'")
+        hs.alert.show("Hopper: no spot named '" .. tostring(spotName) .. "'")
         return nil
     end
 
     local dir = resolveDir(spot)
     local path = obj.newestIn(dir, spot.extensions)
     if not path then
-        hs.alert.show("Cubby: nothing in " .. spotName .. " yet")
+        hs.alert.show("Hopper: nothing in " .. spotName .. " yet")
         log():i("find: " .. spotName .. " (" .. tostring(dir) .. ") is empty")
         return nil
     end
@@ -142,7 +142,7 @@ local function fileURL(path)
     return "file://" .. encoded
 end
 
---- Cubby:open(spotName)
+--- Hopper:open(spotName)
 --- Method
 --- Opens the newest file in a spot with its default application.
 function obj:open(spotName)
@@ -151,7 +151,7 @@ function obj:open(spotName)
     hs.task.new("/usr/bin/open", nil, { path }):start()
 end
 
---- Cubby:reveal(spotName)
+--- Hopper:reveal(spotName)
 --- Method
 --- Opens Finder with the newest file in a spot selected.
 function obj:reveal(spotName)
@@ -160,7 +160,7 @@ function obj:reveal(spotName)
     hs.task.new("/usr/bin/open", nil, { "-R", path }):start()
 end
 
---- Cubby:copy(spotName)
+--- Hopper:copy(spotName)
 --- Method
 --- Copies the newest file in a spot to the clipboard. An image copies as a
 --- picture, ready to paste into a chat or a doc; anything else copies as a
@@ -174,7 +174,7 @@ function obj:copy(spotName)
     if ext and IMAGE_EXTENSIONS[ext:lower()] then
         local image = hs.image.imageFromPath(path)
         if not image then
-            hs.alert.show("Cubby: could not read " .. path:match("[^/]+$"))
+            hs.alert.show("Hopper: could not read " .. path:match("[^/]+$"))
             return
         end
         ok = hs.pasteboard.writeObjects(image)
@@ -185,11 +185,11 @@ function obj:copy(spotName)
     if ok then
         hs.alert.show("Copied: " .. path:match("[^/]+$"))
     else
-        hs.alert.show("Cubby: could not write to the clipboard")
+        hs.alert.show("Hopper: could not write to the clipboard")
     end
 end
 
---- Cubby:captureNew()
+--- Hopper:captureNew()
 --- Method
 --- Takes a fresh screenshot with interactive selection and copies it straight
 --- to the clipboard -- no file on disk, no floating thumbnail, no waiting for
@@ -202,18 +202,18 @@ function obj:captureNew()
         else
             -- exit code 1 is the normal result of pressing Escape mid-selection
             if exitCode ~= 1 then
-                hs.alert.show("Cubby: screencapture failed (" .. tostring(exitCode) .. ")")
+                hs.alert.show("Hopper: screencapture failed (" .. tostring(exitCode) .. ")")
             end
         end
     end, { "-i", "-c" }):start()
 end
 
---- Cubby:bindHotkeys(mapping)
+--- Hopper:bindHotkeys(mapping)
 --- Method
 --- Standard Spoon hotkey binding. Recognised keys: `copyScreenshot`,
 --- `openScreenshot`, `revealScreenshot`, `captureNew`, `copyDownload`,
 --- `openDownload`, `revealDownload`. Most configs skip this and bind straight
---- to `spoon.Cubby:copy` with `args` from `hotkeys.json` instead.
+--- to `spoon.Hopper:copy` with `args` from `hotkeys.json` instead.
 function obj:bindHotkeys(mapping)
     local spec = {
         copyScreenshot   = function() self:copy("screenshot") end,

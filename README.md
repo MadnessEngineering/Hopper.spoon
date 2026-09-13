@@ -1,4 +1,4 @@
-# Cubby.spoon
+# Hopper.spoon
 
 > *Reach into a folder, grab whatever landed there most recently.*
 
@@ -17,20 +17,20 @@ Two spots come stocked:
 Add your own — a folder is all it takes:
 
 ```lua
-spoon.Cubby.spots.receipts = { dir = "/path/to/folder", extensions = { "pdf" } }
+spoon.Hopper.spots.receipts = { dir = "/path/to/folder", extensions = { "pdf" } }
 ```
 
 ## Install
 
 ```sh
-git clone https://github.com/MadnessEngineering/Cubby.spoon.git \
-  ~/.hammerspoon/Spoons/Cubby.spoon
+git clone https://github.com/MadnessEngineering/Hopper.spoon.git \
+  ~/.hammerspoon/Spoons/Hopper.spoon
 ```
 
 ```lua
-hs.loadSpoon("Cubby")
+hs.loadSpoon("Hopper")
 
-spoon.Cubby:bindHotkeys({
+spoon.Hopper:bindHotkeys({
     copyScreenshot = { { "cmd", "ctrl", "alt" }, "i" },
     openDownload   = { { "cmd", "ctrl", "alt" }, "d" },
 })
@@ -42,7 +42,7 @@ Most configs skip `bindHotkeys` and point at the methods straight from
 ```json
 { "id": "hammer+i", "mods": "hammer", "key": "i",
   "description": "Copy latest screenshot",
-  "action": { "kind": "call", "fn": "spoon.Cubby:copy", "args": ["screenshot"] } }
+  "action": { "kind": "call", "fn": "spoon.Hopper:copy", "args": ["screenshot"] } }
 ```
 
 ## What it does with what it finds
